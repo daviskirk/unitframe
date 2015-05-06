@@ -247,10 +247,25 @@ def test_unitframe_ix():
     assert_unitseries(actual, expected)
 
 
-def test_unitframe_loc():
+def test_unitframe_loc_single():
+    uf = get_uf()
+    actual = uf.loc['A']
+    expected = pd.Series([4,5], index=list('ab'), name='A', dtype=np.double)
+    assert_series_equal(actual, expected)
+
+
+def test_unitframe_loc_multiple():
     uf = get_uf()
     actual = uf.loc[['A', 'B']]
     expected = uf
+    assert_unitframe(actual, expected)
+
+
+def test_unitframe_loc_single_set():
+    uf = get_uf()
+    uf.loc['C'] = [8,9.2]
+    actual = uf
+    expected = UnitFrame([[4,5],[1.2,1],[8,9.2]], index=list('ABC'), units=['m','kg'], columns=list('ab'))
     assert_unitframe(actual, expected)
 
 
