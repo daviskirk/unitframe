@@ -187,14 +187,6 @@ class UnitFrame(pd.DataFrame):
             return UnitFrame(*args, **kwargs)
         return tmp_constr
 
-    def __finalize__(self, other, method=None, **kwargs):
-        """ propagate metadata from other to self """
-        # NOTE: backported from pandas master (upcoming v0.13)
-        for name in self._metadata:
-            object.__setattr__(self, name, getattr(other, name, None))
-        self._units = self._units.copy()
-        return self
-
     def copy(self, deep=True):
         """
         Make a copy of this UnitFrame object
