@@ -10,8 +10,8 @@ from numbers import Number
 from functools import partial
 import operator
 from copy import deepcopy
-import pdb
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
+
 UREG = UnitRegistry()
 Q_ = UREG.Quantity
 
@@ -42,16 +42,16 @@ class UnitSeries(pd.Series):
     _metadata = ['_unit']
 
     def __init__(self,*args,**kwargs):
-        is_unit = 'unit' in kwargs
-        if is_unit:
+        if 'unit' in kwargs:
             unit = kwargs['unit']
             del kwargs['unit']
+        else:
+            unit = 1
         kwargs['dtype'] = np.double
         super().__init__(*args,**kwargs)
         if not self.dtype == np.double:
             raise TypeError('dtypes must all be doubles')
-        if is_unit:
-            self.unit = unit
+        self.unit = unit
 
     @property
     def _constructor(self):
@@ -134,12 +134,13 @@ class UnitSeries(pd.Series):
         if self.name is None:
             self.name = ''
         try:
-            self.name += ' [{}]'.format(self._unit.units)
+            unit_str = ', Unit: [{}]'.format(self._unit.units)
         except AttributeError:
             if self._unit == 1:
-                pass
+                unit_str = ', Unit: []'
             else:
                 raise
+        self.name += unit_str
         s = super().__str__()
         self.name = old_name
         return s
@@ -149,16 +150,16 @@ class UnitFrame(pd.DataFrame):
     _metadata = ['_units']
 
     def __init__(self,*args,**kwargs):
-        is_units = 'units' in kwargs
-        if is_units:
+        if 'units' in kwargs:
             units = kwargs['units']
             del kwargs['units']
+        else:
+            units = 1
         kwargs['dtype'] = np.double
         super().__init__(*args,**kwargs)
         if not all(self.dtypes == np.double):
             raise TypeError('dtypes must all be doubles')
-        if is_units:
-            self.units = units
+        self.units = units
 
     @property
     def units(self):
